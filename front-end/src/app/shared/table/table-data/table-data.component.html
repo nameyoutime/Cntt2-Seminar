@@ -1,0 +1,166 @@
+<h1 class="mt-4"></h1>
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="fas fa-table mr-1"></i>
+        Data Table
+    </div>
+    <!-- <div *ngIf="this.fireSer.isEmpty">
+        <h4>Table is empty!</h4>
+    </div> -->
+    <!-- <div *ngIf="!this.fireSer.isEmpty" class="card-body"> -->
+    <div class="card-body">
+        <div>
+            <div class="row">
+                <div class="col-md-2 d-flex align-items-center justify-content-start">
+                    <div>
+                        <div class="input-group rounded">
+                            <input type="search" class="form-control rounded" placeholder="Search" aria-label="Search"
+                                aria-describedby="search-addon" [(ngModel)]="term">
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="col-md-4">
+                    <div class="d-flex align-items-center justify-content-start flex-wrap">
+                        <button id="border" style="margin-right: 1%;"><i class="fas fa-filter"></i></button>
+                        <ng-select class="w-25" [(ngModel)]="selectedTag" (change)="check(selectedTag)"
+                            matTooltip="Filter">
+
+                            <ng-option *ngFor="let tag of tags|async" [value]="tag.id">{{tag.name}}</ng-option>
+                        </ng-select>
+                        <button style="margin-left: 1%;" type="button" class="btn btn-primary btn-floating"
+                            (click)="openTagDialog()" matTooltip="Add tag">
+                            <i class="fas fa-plus"></i>
+                        </button>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+        <div class="table-responsive">
+            <table class="table table-bordered " id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Title</th>
+                        <th>Note</th>
+                        <th>Price</th>
+                        <th>Quanlity</th>
+                        <th>Tag</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>#</th>
+                        <th>Title</th>
+                        <th>Note</th>
+                        <th>Price</th>
+                        <th>Quanlity</th>
+                        <th>Tag</th>
+                        <th></th>
+                    </tr>
+                </tfoot>
+
+                <tbody
+                    *ngFor="let item of collection|async| paginate: { itemsPerPage: numberOfItem, currentPage: p }|filter:term; let i = index">
+                    <tr>
+                        <th scope="row">{{i+1}}</th>
+                        <td (click)="openDetailDialog(item)">{{item.title}}</td>
+                        <td (click)="openDetailDialog(item)" style="width: 30%;">{{item.note}}</td>
+                        <td (click)="openDetailDialog(item)">{{item.price}}VNĐ</td>
+                        <td (click)="openDetailDialog(item)">{{item.quanlity}}</td>
+                        <table class="table table-borderless">
+                            <tr>
+                                <td *ngFor="let tag of item.tag">
+                                    {{tag.name}}
+                                </td>
+                            </tr>
+                        </table>
+
+                        <td>
+                            <button (click)="openUpdateDialog(item)" matTooltip="Update" type="button"
+                                class="btn btn-primary btn-sm px-3" style="margin-right: 3px;">
+                                <i class="fas fa-highlighter"></i>
+                            </button>
+                            <button (click)="deleteItem(item.id)" matTooltip="Delete" type="button"
+                                class="btn btn-danger btn-sm px-3">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </td>
+                    </tr>
+
+
+                    <!-- form update -->
+                    <ng-template #dialogMatSelect>
+                        <form [formGroup]="updateFrm" (ngSubmit)="onSubmit()">
+                            <div class="form-group">
+                                <label>Title</label>
+                                <input type="text" class="form-control" placeholder="Enter Title"
+                                    formControlName="title">
+                            </div>
+                            <div class="form-group">
+                                <label>Note</label>
+                                <input type="text" class="form-control" placeholder="Enter Note" formControlName="note">
+                            </div>
+                            <div class="form-group">
+                                <label>Price</label>
+                                <input type="number" class="form-control" placeholder="Enter Price"
+                                    formControlName="price">
+                            </div>
+                            <div class="form-group">
+                                <label>Quanlity</label>
+                                <input type="number" class="form-control" placeholder="Enter Quanlity"
+                                    formControlName="quanlity">
+                            </div>
+                            <fieldset>
+                                <label>Image</label>
+                                <input (change)="onFileChange($event)" type="file" accept=".jpg,.jpeg,.png"
+                                    class="form-control" id="customFile" />
+                            </fieldset>
+                            <button #submit type="submit" style="border: none;
+                background:none;"></button>
+                        </form>
+                        <fieldset class="container" id="updateForm">
+                            <div class="row" style="margin-bottom: 5%;">
+                                <div class="col-md-6">
+                                    <ng-select class="w-100" [(ngModel)]="selectedTag"
+                                        (change)="valChange(selectedTag)">
+                                        <ng-option *ngFor="let tag of tags|async" [value]="tag.id">{{tag.name}}
+                                        </ng-option>
+                                    </ng-select>
+                                </div>
+                                <div class="col-md ml-1">
+                                    <button class="h-100 p-2 btn-primary btn-lg" matTooltip="Add tag">
+                                        <i class="fas fa-plus" (click)="addUpdateTag()"></i>
+                                    </button>
+                                </div>
+
+
+
+                            </div>
+                        </fieldset>
+                        <div class="row itemsBlock text-center" style="margin-bottom: 5%;" id="updateForm">
+                            <div *ngFor="let item of currentTag;let i = index" class="col-md-4 col-sm-6 col-12">
+                                <button type="button" class="mt-1 p-2 btn btn-outline-dark btn-rounded"
+                                    data-mdb-ripple-color="dark" (click)="removeUpdateTag(i)"
+                                    matTooltip="Remove tag">{{item.name}} <i class="fas fa-minus"></i></button>
+
+                            </div>
+                        </div>
+
+
+
+                        <button class="btn btn-primary" (click)="submit.click()">Update</button>
+
+                    </ng-template>
+                    <!-- end of form update -->
+                </tbody>
+            </table>
+            <pagination-controls (pageChange)="p = $event"></pagination-controls>
+        </div>

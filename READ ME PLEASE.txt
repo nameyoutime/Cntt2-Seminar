@@ -1,0 +1,13 @@
+RUN SERVER: 
+npm i
+nodemon src\server.js
+
+RUN FRONT END:
+npm i
+npm s -o
+
+test account:
+not login with google
+sign in with username and password
+username:thien@gmail.com
+password:123456
